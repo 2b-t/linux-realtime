@@ -1,8 +1,8 @@
-# Docker real-time guide for Ubuntu Realtime-Kernel or `PREEMPT_RT`
+# Linux and Docker real-time guide for Ubuntu Realtime-Kernel and `PREEMPT_RT`
 
-Author: [Tobit Flatscher](https://github.com/2b-t) (August 2021 - February 2023)
+Author: [Tobit Flatscher](https://github.com/2b-t) (2021 - 2024)
 
-[![Tests](https://github.com/2b-t/docker-realtime/actions/workflows/run-tests.yml/badge.svg)](https://github.com/2b-t/docker-realtime/actions/workflows/run-tests.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Tests](https://github.com/2b-t/linux-realtime/actions/workflows/run-tests.yml/badge.svg)](https://github.com/2b-t/linux-realtime/actions/workflows/run-tests.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 
 
@@ -32,7 +32,7 @@ but may also apply to software developers developing any other form of real-time
 
 
 
-## 1. Docker for real-time applications
+## 1. Linux for real-time applications
 
 There are different ways of turning a vanilla Linux system into a real-time capable operating system. As outlined in [`doc/RealTimeLinux.md`](./doc/RealTimeLinux.md) **[`PREEMPT_RT`](https://wiki.linuxfoundation.org/realtime/start)** is likely the most future-proof possibility as it is about to be included into the mainline of Linux. As of Ubuntu 22.04 it is also available to Ubuntu users out of the box with [Ubuntu Pro](https://ubuntu.com/pro).
 
@@ -55,7 +55,7 @@ Alternatively, I have also lined out the installation procedure either by compil
 
 ### 1.2 Setting up real-time privileges
 
-After having patched your system and restarted it, booting into the freshly installed kernel, you should already be good to go to launch a real-time capable Docker. In case you do not intend to use [`root` as the user inside the Docker](https://medium.com/jobteaser-dev-team/docker-user-best-practices-a8d2ca5205f4) you furthermore will have to have give yourself a name of a user that belongs to a group with **real-time privileges on your host computer**. How this can be done can be found in [`doc/PreemptRt.md`](./doc/PreemptRt.md).
+After having patched your system and restarted it, booting into the freshly installed kernel, you should already be good to go and be able to launch a real-time capable Docker. In case you do not intend to use [`root` as the user inside the Docker](https://medium.com/jobteaser-dev-team/docker-user-best-practices-a8d2ca5205f4) you furthermore will have to have give yourself a name of a user that belongs to a group with **real-time privileges on your host computer**. How this can be done can be found in [`doc/PreemptRt.md`](./doc/PreemptRt.md).
 
 ### 1.3 Launching the Docker
 
@@ -71,7 +71,7 @@ After having patched your system and restarted it, booting into the freshly inst
     network_mode: host
 ```
 
-Then **any process from inside the Docker can set real-time priorities `rtprio`** (e.g. by calling [`::pthread_setschedparam`](https://man7.org/linux/man-pages/man3/pthread_getschedparam.3.html) from inside the C/C++ code or by using [`chrt`](https://askubuntu.com/a/51285) from the command line). Generally it is advisable to [not set `rtprio` to 99](https://github.com/ros2-realtime-demo/pendulum/blob/rolling/docs/real_time_linux.md#setting-permissions-for-the-scheduler) (refer to [pull request #3](https://github.com/2b-t/docker-realtime/pull/3#issuecomment-1296926347) for more information).
+Then **any process from inside the Docker can set real-time priorities `rtprio`** (e.g. by calling [`::pthread_setschedparam`](https://man7.org/linux/man-pages/man3/pthread_getschedparam.3.html) from inside the C/C++ code or by using [`chrt`](https://askubuntu.com/a/51285) from the command line). Generally it is advisable to [not set `rtprio` to 99](https://github.com/ros2-realtime-demo/pendulum/blob/rolling/docs/real_time_linux.md#setting-permissions-for-the-scheduler) (refer to [pull request #3](https://github.com/2b-t/linux-realtime/pull/3#issuecomment-1296926347) for more information).
 
 
 
