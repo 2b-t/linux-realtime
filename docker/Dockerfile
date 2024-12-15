@@ -16,7 +16,6 @@ RUN apt-get update \
     libnuma-dev \
     make \
     python3 \
-    python3-distutils \
  && rm -rf /var/lib/apt/lists/*
 
 # Dependencies for Bash unit-tests
