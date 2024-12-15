@@ -21,8 +21,8 @@ function remove_right_of_dot() {
 
 function install_dependencies() {
   declare desc="Install the missing dependencies for the PREEMPT_RT compilation from source"
-  sudo apt-get install -y grep curl sed
-  sudo apt-get install -y build-essential bc ca-certificates gnupg2 libssl-dev lsb-release libelf-dev bison flex dwarves zstd libncurses-dev dpkg-dev
+  sudo apt-get install -y curl grep sed
+  sudo apt-get install -y bc bison build-essential ca-certificates cpio debhelper-compat dpkg-dev dwarves flex gnupg2 libelf-dev libncurses-dev libssl-dev lsb-release rsync zstd
 }
 
 function get_preemptrt_minor_versions() {
