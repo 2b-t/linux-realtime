@@ -250,7 +250,7 @@ Now it is time to build the kernel:
   ```shell
   $ make clean # Optional to remove old relicts (from previously failed compilations)
   # The following command might take very long!
-  $ sudo make -j$(nproc) deb-pkg
+  $ sudo make -j$(nproc) bindeb-pkg
   ```
   
   where the [`revision` parameter is just for keeping track of the version number of your kernel builds](https://www.debian.org/releases/wheezy/amd64/ch08s06.html.en) and can be changed at will, similarly for the `custom` word.

@@ -219,7 +219,7 @@ function select_installation_mode() {
 
 function generate_preemptrt_kernel_debian_package() {
   declare desc="Generate Debian package for easier installation and uninstallation"
-  sudo make -j$(nproc) deb-pkg
+  sudo make -j$(nproc) bindeb-pkg
 }
 
 function select_install_now() {
