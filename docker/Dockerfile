@@ -1,4 +1,4 @@
-FROM ubuntu:focal
+FROM ubuntu:latest
 
 ENV WS_DIR="/benchmark"
 WORKDIR ${WS_DIR}
