@@ -93,12 +93,12 @@ Afterwards you can reboot your system (be sure to select the correct kernel!) an
 
 ##### 1.2.2.2 Manual installation
 
-Have a look at the search results resulting from [this query on package.debian.org](https://packages.debian.org/search?keywords=linux-image-rt-amd64) (potentially changing the architecture!) and see if you can find a kernel close to yours, e.g. [this one](https://packages.debian.org/bullseye/linux-image-rt-amd64). If you can find one click on the architecture `amd64` under `Download linux-image-rt-amd64` on the bottom and select a geographically suiting mirror and save the image in a location of your choice.
+Have a look at the search results resulting from [this query on package.debian.org](https://packages.debian.org/search?keywords=linux-image-rt-amd64) and see if you can find a kernel close to yours, e.g. [this one](https://packages.debian.org/bullseye/linux-image-rt-amd64). If you can find one click on the dependency `dep` and then on the architecture `amd64` under `Download linux-image-*-rt-amd64` on the bottom and select a geographically suiting mirror and save the Debian package in a location of your choice.
 
 Finally install it by opening a terminal in this folder and typing
 
 ```shell
-$ sudo dpkg -i linux-image-rt-amd64_5.10.106-1_amd64.deb
+$ sudo dpkg -i linux-image-5.10.0-33-rt-amd64_5.10.226-1_amd64.deb
 $ sudo apt-get install -f
 ```
 

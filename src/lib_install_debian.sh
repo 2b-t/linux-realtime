@@ -14,21 +14,27 @@ function get_debian_versions() {
   echo $(cat /etc/debian_version | tr / " ")
 }
 
-function get_preemptrt_file() {
-  declare desc="Get the PREEMPT_RT filename for the given Debian distribution by crawling the website"
+function get_architecture() {
+  declare desc="Get the computer architecture"
+  echo $(dpkg --print-architecture)
+}
+
+function get_preemptrt_debian_package() {
+  declare desc="Get the Debian package dependency referred to by the meta-package"
   local DEBIAN_VERSION=$1
-  local ARCHITECTURE=$(dpkg --print-architecture)
-  echo $(curl -Ls https://packages.debian.org/${DEBIAN_VERSION}/${ARCHITECTURE}/linux-image-rt-${ARCHITECTURE}/download | grep -o -P '(?<=<h2>Download Page for <kbd>)(linux-image-rt.*)(?=<\/kbd>)')
+  local ARCHITECTURE=$2
+  echo $(curl -Ls https://packages.debian.org/${DEBIAN_VERSION}/linux-image-rt-${ARCHITECTURE} | grep -o -P "(?<=<a href=\"\/${DEBIAN_VERSION}\/)(linux-image-.*-rt-${ARCHITECTURE})(?=\")")
 }
 
 function select_debian_version() {
   declare desc="Select the Debian version from a list of given Debian versions"
   local POSSIBLE_DEBIAN_VERSIONS=$(get_debian_versions)
+  local ARCHITECTURE=$(get_architecture)
   local DIALOG_POSSIBLE_DEBIAN_VERSIONS=""
   for VER in ${POSSIBLE_DEBIAN_VERSIONS}; do
-    local PREEMPTRT_FILE=$(get_preemptrt_file "$VER")
-    if [ ! -z "${PREEMPTRT_FILE}" ]; then
-      DIALOG_POSSIBLE_DEBIAN_VERSIONS="${DIALOG_POSSIBLE_DEBIAN_VERSIONS} ${VER} ${PREEMPTRT_FILE}"
+    local PREEMPTRT_DEBIAN_PACKAGE=$(get_preemptrt_debian_package "${VER}" "${ARCHITECTURE}")
+    if [ ! -z "${PREEMPTRT_DEBIAN_PACKAGE}" ]; then
+      DIALOG_POSSIBLE_DEBIAN_VERSIONS="${DIALOG_POSSIBLE_DEBIAN_VERSIONS} ${VER} ${PREEMPTRT_DEBIAN_PACKAGE}"
     fi
   done
   echo $(dialog --keep-tite --stdout --menu "Select the desired PREEMPT_RT kernel version:" 0 0 4 ${DIALOG_POSSIBLE_DEBIAN_VERSIONS})
@@ -37,8 +43,9 @@ function select_debian_version() {
 function get_download_locations() {
   declare desc="Get a list of available download servers for the PREEMPT_RT Debian package given the Debian version by crawling the website"
   local DEBIAN_VERSION=$1
-  local ARCHITECTURE=$(dpkg --print-architecture)
-  echo $(curl -Ls https://packages.debian.org/${DEBIAN_VERSION}/${ARCHITECTURE}/linux-image-rt-${ARCHITECTURE}/download | grep -o -P '(?<=<li><a href=\")(.*\.deb)(?=\">)')
+  local ARCHITECTURE=$(get_architecture)
+  local DEBIAN_PACKAGE=$(get_preemptrt_debian_package "${DEBIAN_VERSION}" "${ARCHITECTURE}")
+  echo $(curl -Ls https://packages.debian.org/${DEBIAN_VERSION}/${ARCHITECTURE}/${DEBIAN_PACKAGE}/download | grep -o -P '(?<=<li><a href=\")(.*\.deb)(?=\">)')
 }
 
 function select_download_location() {

@@ -27,11 +27,12 @@ function setup() {
   assert_regex "${DEBIAN_VERSIONS}" "^([a-z]( )?)+$"
 }
 
-@test "Test get_preemptrt_file" {
+@test "Test get_preemptrt_debian_package" {
   declare desc="Test if a valid Debian file is returned for the given Debian version"
-  local DEBIAN_VERSION="bullseye"
-  local PREEMPTRT_FILE=$(get_preemptrt_file "${DEBIAN_VERSION}")
-  assert_regex "${PREEMPTRT_FILE}" "^(linux-image-rt-).+(\.deb)$"
+  local DEBIAN_VERSION="trixie"
+  local ARCHITECTURE=$(get_architecture)
+  local PREEMPTRT_FILE=$(get_preemptrt_debian_package "${DEBIAN_VERSION}" "${ARCHITECTURE}")
+  assert_regex "${PREEMPTRT_FILE}" "^(linux-image-).+(-rt-${ARCHITECTURE})$"
 }
 
 @test "Test select_debian_version" {
@@ -49,14 +50,14 @@ function setup() {
 
 @test "Test get_download_locations" {
   declare desc="Test if a valid hyperlink is returned for the given Debian version"
-  local DEBIAN_VERSION="bullseye"
+  local DEBIAN_VERSION="trixie"
   local DOWNLOAD_LOCATION=$(get_download_locations "${DEBIAN_VERSION}")
   assert_regex "${DOWNLOAD_LOCATION}" "^(http://).+(\.deb)$"
 }
 
 @test "Test select_download_location" {
   declare desc="Test if select download location dialog returns a single option only"
-  local DEBIAN_VERSION="bullseye"
+  local DEBIAN_VERSION="trixie"
   tmux new -d -A -s "bats_test_session"
   local TEST_FILE=$(test_file)
   tmux send-keys -t "bats_test_session" "source ${TEST_FILE}" Enter
@@ -70,8 +71,8 @@ function setup() {
 
 @test "Test extract_filename" {
   declare desc="Test if filename is extracted correctly from hyperlink"
-  local DOWNLOAD_LOCATION="http://ftp.us.debian.org/debian/pool/main/l/linux-signed-amd64/linux-image-rt-amd64_5.10.127-1_amd64.deb"
+  local DOWNLOAD_LOCATION="http://ftp.us.debian.org/debian/pool/main/l/linux-signed-amd64/linux-image-6.12.6-rt-amd64_6.12.6-1_amd64.deb"
   local DOWNLOADED_FILE=$(extract_filename "${DOWNLOAD_LOCATION}")
-  assert_regex "${DOWNLOADED_FILE}" "^(linux-image-rt-).+(\.deb)$"
+  assert_regex "${DOWNLOADED_FILE}" "^(linux-image-).+(\.deb)$"
 }
 
