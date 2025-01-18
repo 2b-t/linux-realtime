@@ -1,6 +1,6 @@
 # Linux and Docker real-time guide for Ubuntu Realtime-Kernel and `PREEMPT_RT`
 
-Author: [Tobit Flatscher](https://github.com/2b-t) (2021 - 2024)
+Author: [Tobit Flatscher](https://github.com/2b-t) (2021 - 2025)
 
 [![Tests](https://github.com/2b-t/linux-realtime/actions/workflows/run-tests.yml/badge.svg)](https://github.com/2b-t/linux-realtime/actions/workflows/run-tests.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
