@@ -6,6 +6,8 @@ Author: [Tobit Flatscher](https://github.com/2b-t) (2021 - 2024)
 
 The set-up of `PREEMPT_RT` basically consists in **installing a new kernel** either from an existing **Debian package** that was compiled by somebody else for you (e.g. Ubuntu realtime-kernel), by creating a Debian package yourself by recompiling the kernel or installing it directly. After that you will have to perform a restart and booting into that freshly installed kernel as well as potentially changing the boot order in order to not having to boot into it manually at start-up.
 
+The set-up on **Nvidia Jetson** edge compute devices is slightly different and is discussed in a dedicated section at the end of this document.
+
 The huge difference a `PREEMPT_RT`-patched kernel has on the **latency** of a system can be seen in the graphs below for two different systems (refer to the real-time optimizations for a more precise explanation of how these graphs can be obtained). Note that both graphs are double-logarithmical plots and as such the difference at a first glance might not seem as big. But as can be seen from the maximum latencies the latency of a `PREEMPT_RT`-patched system is roughly **between one to two orders of magnitude lower**. For any real-time determinism this maximum latency is much more important than the average latency.
 
 #### Lenovo ThinkStation P500
@@ -345,3 +347,60 @@ Select the desired kernel as default under `General/default entry/predefined` (s
 ![Default boot entry in Grub customizer](../media/grub_customizer_default.png)
 
 You should now automatically boot into your freshly installed `PREEMPT_RT`-patched kernel.
+
+
+
+## 2. Setting-up `PREEMPT_RT` on Nvidia Jetson
+
+The installation procedure for the Nvidia Jetson is slightly different. You can either:
+
+- Download the **Jetson Linux real-time kernel packages** as described [here](https://docs.nvidia.com/jetson/archives/r36.4/DeveloperGuide/SD/Kernel/KernelCustomization.html#real-time-kernel-using-ota-update) (recommended)
+- **Download the kernel sources and patching it with the real-time patch** as described [here](https://docs.nvidia.com/jetson/archives/r35.1/DeveloperGuide/text/SD/Kernel/KernelCustomization.html) (not recommended, might be useful in some cases)
+- Flash the board with a real-time kernel as described [here](https://orenbell.com/setting-up-realtime-kernel-on-jetson/) (not recommended anymore)
+
+### 2.1 Installing Jetson Linux with from Debian packages
+
+For installing the real-time kernel from a Debian package first check the Jetson Linux version as described [here](https://collabnix.com/how-to-find-jetpack-version-of-nvidia-jetson-nano/):
+
+```bash
+$ dpkg-query --show nvidia-l4t-core
+```
+
+Open the sources list with a text editor (see also [here](https://docs.nvidia.com/jetson/archives/r36.4/DeveloperGuide/SD/Kernel/KernelCustomization.html#real-time-kernel-using-ota-update))
+
+```bash
+$ sudo nano /etc/apt/sources.list.d/nvidia-l4t-apt-source.list
+```
+
+and insert the following source into the file
+
+```bash
+deb https://repo.download.nvidia.com/jetson/rt-kernel <release> main
+```
+
+replacing `<release>` with the release number of the minor release from the output of the first command, e.g. for `nvidia-l4t-core 32.7.1-20220219085840` the command would be 
+
+```
+deb https://repo.download.nvidia.com/jetson/rt-kernel r32.7 main
+```
+
+Then run the following commands to install the real-time kernel packages:
+
+```bash
+$ sudo apt-get update
+$ sudo apt-get install nvidia-l4t-rt-kernel nvidia-l4t-rt-kernel-headers nvidia-l4t-rt-kernel-oot-modules nvidia-l4t-display-rt-kernel
+$ sudo reboot
+```
+
+After the computer has rebooted you should reboot into a real-time patched kernel.
+
+### 2.2 Removing the real-time kernel packages
+
+For removing the real-time kernel again, run the following commands:
+
+```bash
+$ sudo apt-get remove nvidia-l4t-rt-kernel nvidia-l4t-rt-kernel-headers nvidia-l4t-rt-kernel-oot-modules nvidia-l4t-display-rt-kernel
+$ sudo reboot
+```
+
+After the reboot you should boot into the non-real-time patched kernel.
