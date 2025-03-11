@@ -197,3 +197,49 @@ Putting this together with the previous Grub configuration options this leaves u
 GRUB_CMDLINE_LINUX_DEFAULT=“isolcpus=1-3,5,7 nohz_full=1-3,5,7 rcu_nocbs=1-3,5,7”
 ```
 
+## 6. Nvidia Jetson
+
+The tuning of the Nvidia Jetson is slightly different from traditional computers and is described in the section below.
+
+The real-time kernel on an Nvidia Jetson will likely perform very poorly and quite similar to a non-RT kernel without tuning (see [here](https://forums.developer.nvidia.com/t/preempt-rt-and-regular-kernel-show-similar-latencies-using-cyclictest/273435/6)). You will have to force the Jetson to not use frequency scaling.
+
+First of all **change the power mode** to `0` as described [here](https://docs.nvidia.com/jetson/archives/r34.1/DeveloperGuide/text/SD/PlatformPowerAndPerformance/JetsonXavierNxSeriesAndJetsonAgxXavierSeries.html#power-mode-controls) by running:
+
+```bash
+$ nvpmodel -m 0
+```
+
+You can make this persistent by modifying the entry `< PM_CONFIG DEFAULT=N >` to `< PM_CONFIG DEFAULT=0 >` in `/etc/nvpmodel.conf`  as described [here](https://forums.developer.nvidia.com/t/nvpmodel-default-mode/76786/2). You can query the power mode with `$ nvpmodel -q`.
+
+Then **start Jetson clocks** with
+
+```bash
+$ sudo jetson_clocks
+```
+
+You can make this persistent by adding a service `/etc/systemd/system/jetson_clocks.service` with the following contents as described [here](https://forums.developer.nvidia.com/t/how-can-i-enable-jetson-clocks-to-run-automatically-at-startup-on-jetson-agx-orin/316108/3):
+
+```
+[Unit]
+Description=Start jetson_clocks at start-up
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/jetson_clocks
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target
+```
+
+and activating it with `$ sudo systemctl enable jetson_clocks.service` and then starting it `$ sudo systemctl start jetson_clocks.service`.
+
+Whether it is active can be checked with [`jetson_stats`](https://github.com/rbonghi/jetson_stats) by running `$ jtop`.
+
+The image below shows the performance of an [Nvidia Jetson AGX Orin](https://www.nvidia.com/en-gb/autonomous-machines/embedded-systems/jetson-orin/) before and after tuning. The latency is vastly improved by tuning but still comparably high.
+
+| ![Before tuning](../media/jetson_orin_before_tuning.png) | ![After tuning](../media/jetson_orin_after_tuning.png) |
+| -------------------------------------------------------- | ------------------------------------------------------ |
+| Nvidia Jetson AGX Orin: Latency before tuning            | Nvidia Jetson AGX Orin: Latency after tuning           |
+

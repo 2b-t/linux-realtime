@@ -358,6 +358,8 @@ The installation procedure for the Nvidia Jetson is slightly different. You can 
 - **Download the kernel sources and patching it with the real-time patch** as described [here](https://docs.nvidia.com/jetson/archives/r35.1/DeveloperGuide/text/SD/Kernel/KernelCustomization.html) (not recommended, might be useful in some cases)
 - Flash the board with a real-time kernel as described [here](https://orenbell.com/setting-up-realtime-kernel-on-jetson/) (not recommended anymore)
 
+The real-time kernel on an Nvidia Jetson will likely perform very poorly and quite similar to a non-RT kernel without tuning (see [here](https://forums.developer.nvidia.com/t/preempt-rt-and-regular-kernel-show-similar-latencies-using-cyclictest/273435/6)). **Please refer to the tuning guide on how to tune the system!**
+
 ### 2.1 Installing Jetson Linux with from Debian packages
 
 For installing the real-time kernel from a Debian package first check the Jetson Linux version as described [here](https://collabnix.com/how-to-find-jetpack-version-of-nvidia-jetson-nano/):
