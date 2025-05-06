@@ -8,7 +8,7 @@
 
 function test_file() {
   declare desc="Get the filename of the file to be tested"
-  local DIR="$( cd "$( dirname "${BATS_TEST_FILENAME}" )" >/dev/null 2>&1 && pwd )"
+  local DIR="$( cd "$( dirname "${BATS_TEST_FILENAME}" )" > /dev/null 2>&1 && pwd )"
   echo "${DIR}/../src/lib_compile_kernel.sh"
 }
 
@@ -18,6 +18,14 @@ function setup() {
   load "test_helper/bats-assert/load"
   local TEST_FILE=$(test_file)
   source "${TEST_FILE}"
+}
+
+function teardown() {
+  declare desc="Make sure that the last test is cleaned up"
+  tmux kill-session -t "bats_test_session"
+  if [ -f /tmp/capture ] ; then
+    rm /tmp/capture
+  fi
 }
 
 @test "Test is_valid_url" {
@@ -56,11 +64,11 @@ function setup() {
   tmux new -d -A -s "bats_test_session"
   local TEST_FILE=$(test_file)
   tmux send-keys -t "bats_test_session" "source ${TEST_FILE}" Enter
-  tmux send-keys -t "bats_test_session" 'echo $(select_preemptrt_minor_version) >/tmp/capture' Enter
+  tmux send-keys -t "bats_test_session" 'echo $(select_preemptrt_minor_version) > /tmp/capture' Enter
   sleep 5
   tmux send-keys -t "bats_test_session" Enter
   tmux send-keys -t "bats_test_session" "exit" Enter
-  local PREEMPTRT_MINOR_VERSION=$(</tmp/capture)
+  local PREEMPTRT_MINOR_VERSION=$(< /tmp/capture)
   assert_not_equal "${PREEMPTRT_MINOR_VERSION}" ""
   assert_regex "${PREEMPTRT_MINOR_VERSION}" "^[0-9]+\.[0-9]+(\.[0-9]+)?$"
 }
@@ -81,11 +89,11 @@ function setup() {
   tmux new -d -A -s "bats_test_session"
   local TEST_FILE=$(test_file)
   tmux send-keys -t "bats_test_session" "source ${TEST_FILE}" Enter
-  tmux send-keys -t "bats_test_session" 'echo $(select_preemptrt_full_version '"${PREEMPTRT_MINOR_VERSION}"') >/tmp/capture' Enter
+  tmux send-keys -t "bats_test_session" 'echo $(select_preemptrt_full_version '"${PREEMPTRT_MINOR_VERSION}"') > /tmp/capture' Enter
   sleep 5
   tmux send-keys -t "bats_test_session" Enter
   tmux send-keys -t "bats_test_session" "exit" Enter
-  local PREEMPTRT_FULL_VERSION=$(</tmp/capture)
+  local PREEMPTRT_FULL_VERSION=$(< /tmp/capture)
   assert_not_equal "${PREEMPTRT_FULL_VERSION}" ""
   assert_regex "${PREEMPTRT_FULL_VERSION}" "^[0-9]+\.[0-9]+(\.[0-9]+)+\-rt[0-9]+$"
 }
@@ -162,11 +170,11 @@ function setup() {
   tmux new -d -A -s "bats_test_session"
   local TEST_FILE=$(test_file)
   tmux send-keys -t "bats_test_session" "source ${TEST_FILE}" Enter
-  tmux send-keys -t "bats_test_session" 'echo $(select_manual_configuration) >/tmp/capture' Enter
+  tmux send-keys -t "bats_test_session" 'echo $(select_manual_configuration) > /tmp/capture' Enter
   sleep 5
   tmux send-keys -t "bats_test_session" Enter
   tmux send-keys -t "bats_test_session" "exit" Enter
-  local IS_MANUAL_CONFIG=$(</tmp/capture)
+  local IS_MANUAL_CONFIG=$(< /tmp/capture)
   assert_equal "${IS_MANUAL_CONFIG}" 1
 }
 
@@ -175,11 +183,11 @@ function setup() {
   tmux new -d -A -s "bats_test_session"
   local TEST_FILE=$(test_file)
   tmux send-keys -t "bats_test_session" "source ${TEST_FILE}" Enter
-  tmux send-keys -t "bats_test_session" 'echo $(select_installation_mode) >/tmp/capture' Enter
+  tmux send-keys -t "bats_test_session" 'echo $(select_installation_mode) > /tmp/capture' Enter
   sleep 5
   tmux send-keys -t "bats_test_session" Enter
   tmux send-keys -t "bats_test_session" "exit" Enter
-  local INSTALLATION_MODE=$(</tmp/capture)
+  local INSTALLATION_MODE=$(< /tmp/capture)
   assert_equal "${INSTALLATION_MODE}" "Debian"
 }
 
@@ -188,11 +196,11 @@ function setup() {
   tmux new -d -A -s "bats_test_session"
   local TEST_FILE=$(test_file)
   tmux send-keys -t "bats_test_session" "source ${TEST_FILE}" Enter
-  tmux send-keys -t "bats_test_session" 'echo $(select_install_now) >/tmp/capture' Enter
+  tmux send-keys -t "bats_test_session" 'echo $(select_install_now) > /tmp/capture' Enter
   sleep 5
   tmux send-keys -t "bats_test_session" Enter
   tmux send-keys -t "bats_test_session" "exit" Enter
-  local IS_INSTALL_NOW=$(</tmp/capture)
+  local IS_INSTALL_NOW=$(< /tmp/capture)
   assert_equal "${IS_INSTALL_NOW}" 0
 }
 

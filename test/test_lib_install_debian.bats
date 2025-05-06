@@ -8,7 +8,7 @@
 
 function test_file() {
   declare desc="Get the filename of the file to be tested"
-  local DIR="$( cd "$( dirname "${BATS_TEST_FILENAME}" )" >/dev/null 2>&1 && pwd )"
+  local DIR="$( cd "$( dirname "${BATS_TEST_FILENAME}" )" > /dev/null 2>&1 && pwd )"
   echo "${DIR}/../src/lib_install_debian.sh"
 }
 
@@ -18,6 +18,14 @@ function setup() {
   load "test_helper/bats-assert/load"
   local TEST_FILE=$(test_file)
   source ${TEST_FILE}
+}
+
+function teardown() {
+  declare desc="Make sure that the last test is cleaned up"
+  tmux kill-session -t "bats_test_session"
+  if [ -f /tmp/capture ] ; then
+    rm /tmp/capture
+  fi
 }
 
 @test "Test get_debian_versions" {
@@ -40,11 +48,13 @@ function setup() {
   tmux new -d -A -s "bats_test_session"
   local TEST_FILE=$(test_file)
   tmux send-keys -t "bats_test_session" "source ${TEST_FILE}" Enter
-  tmux send-keys -t "bats_test_session" 'echo $(select_debian_version) >/tmp/capture' Enter
-  sleep 5
+  tmux send-keys -t "bats_test_session" 'echo $(select_debian_version) > /tmp/capture' Enter
+  sleep 30
   tmux send-keys -t "bats_test_session" Enter
+  sleep 2
   tmux send-keys -t "bats_test_session" "exit" Enter
-  local DEBIAN_VERSION=$(</tmp/capture)
+  sleep 2
+  local DEBIAN_VERSION=$(< /tmp/capture)
   assert_regex "${DEBIAN_VERSION}" "^([a-z])+$"
 }
 
@@ -61,11 +71,13 @@ function setup() {
   tmux new -d -A -s "bats_test_session"
   local TEST_FILE=$(test_file)
   tmux send-keys -t "bats_test_session" "source ${TEST_FILE}" Enter
-  tmux send-keys -t "bats_test_session" 'echo $(select_download_location '"${DEBIAN_VERSION})"' >/tmp/capture' Enter
-  sleep 5
+  tmux send-keys -t "bats_test_session" 'echo $(select_download_location '"${DEBIAN_VERSION})"' > /tmp/capture' Enter
+  sleep 30
   tmux send-keys -t "bats_test_session" Enter
+  sleep 2
   tmux send-keys -t "bats_test_session" "exit" Enter
-  local DOWNLOAD_LOCATION=$(</tmp/capture)
+  sleep 2
+  local DOWNLOAD_LOCATION=$(< /tmp/capture)
   assert_regex "${DOWNLOAD_LOCATION}" "^(http://).+(\.deb)$"
 }
 
